@@ -27,11 +27,11 @@ const settingsRouter = require('./routes/admin/settings')
 const AdminRouter = require('./routes/admin/admin')
 const AdminUserRouter = require('./routes/admin/users')
 const AdminBattleRouter = require('./routes/admin/battles')
-//const AdminGameRouter = require('./routes/admin/games')
+const AdminGameRouter = require('./routes/admin/games')
 
 const PORT = process.env.PORT || 3000
 
-/*
+
 //routes
 app.use(userRouter)
 app.use(dashboardRouter)
@@ -43,7 +43,7 @@ app.use(AdminRouter)
 app.use(AdminUserRouter)
 app.use(AdminBattleRouter)
 app.use(AdminGameRouter)
-*/
+
 // server configurations
 server.listen(PORT, () => {
     console.log(`Server is running at port no: ${PORT}`)
