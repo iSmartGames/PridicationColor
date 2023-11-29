@@ -1,32 +1,32 @@
-const path = require("path")
-const bodyParser = require('body-parser')
-const cookieParser = require('cookie-parser')
-const session = require('express-session')
+import path from "path"
+import { json, urlencoded } from 'body-parser'
+import cookieParser from 'cookie-parser'
+import session from 'express-session'
 const dotenv = require('dotenv').config()
-const mongoose = require('./db/mongoose')
-const fileUpload = require('express-fileupload');
+import mongoose from './db/mongoose'
+import fileUpload from 'express-fileupload'
 
 // socketio service
-const { app, io, cors, server } = require('./services/socketio')
+import { app, io, cors, server } from './services/socketio'
 
 // Express settings
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
+app.use(json());
+app.use(urlencoded({
     extended: false
 }));
 app.use(fileUpload())
 
 
-const userRouter = require('./routes/user')
-const dashboardRouter = require('./routes/dashboard')
-const battlesRouter = require('./routes/battles')
-const walletsRouter = require('./routes/wallets')
-const gamesRouter = require('./routes/games')
-const settingsRouter = require('./routes/admin/settings')
-const AdminRouter = require('./routes/admin/admin')
-const AdminUserRouter = require('./routes/admin/users')
-const AdminBattleRouter = require('./routes/admin/battles')
-const AdminGameRouter = require('./routes/admin/games')
+import userRouter from './routes/user'
+import dashboardRouter from './routes/dashboard'
+import battlesRouter from './routes/battles'
+import walletsRouter from './routes/wallets'
+import gamesRouter from './routes/games'
+import settingsRouter from './routes/admin/settings'
+import AdminRouter from './routes/admin/admin'
+import AdminUserRouter from './routes/admin/users'
+import AdminBattleRouter from './routes/admin/battles'
+import AdminGameRouter from './routes/admin/games'
 const PORT = process.env.PORT || 3000
 
 //routes
