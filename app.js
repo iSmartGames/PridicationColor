@@ -27,7 +27,7 @@ const settingsRouter = require('./routes/admin/settings')
 const AdminRouter = require('./routes/admin/admin')
 const AdminUserRouter = require('./routes/admin/users')
 const AdminBattleRouter = require('./routes/admin/battles')
-const AdminGameRouter = require('./routes/admin/games')
+//const AdminGameRouter = require('./routes/admin/games')
 
 const PORT = process.env.PORT || 3000
 
