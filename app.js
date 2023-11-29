@@ -16,6 +16,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(fileUpload())
 
+const PORT = process.env.PORT || 3000
 /*
 const userRouter = require('./routes/user')
 const dashboardRouter = require('./routes/dashboard')
