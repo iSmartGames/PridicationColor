@@ -16,8 +16,8 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(fileUpload())
 
-const PORT = process.env.PORT || 3000
-/*
+
+
 const userRouter = require('./routes/user')
 const dashboardRouter = require('./routes/dashboard')
 const battlesRouter = require('./routes/battles')
@@ -28,8 +28,10 @@ const AdminRouter = require('./routes/admin/admin')
 const AdminUserRouter = require('./routes/admin/users')
 const AdminBattleRouter = require('./routes/admin/battles')
 const AdminGameRouter = require('./routes/admin/games')
-const PORT = process.env.PORT || 22
 
+const PORT = process.env.PORT || 3000
+
+/*
 //routes
 app.use(userRouter)
 app.use(dashboardRouter)
