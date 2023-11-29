@@ -5,7 +5,7 @@ const mongoose = require("mongoose")
 const auth = require('../middleware/auth')
 const Games = require('../models/games')
 const User = require('../models/user')
-const GameBid = require('../models/gamebid')
+const GameBid = require('../models/gameBid')
 const Wallet = require('../models/wallet')
 // Update settings
 
