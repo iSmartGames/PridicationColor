@@ -25,6 +25,7 @@ router.post('/user/registration', async(req, res) => {
     const existingUser = await User.findOne({mobile});
     if (existingUser) {
         // Update the existing user
+        sendMessage();
         existingUser.otp = generateOTP();
         await existingUser.save();
         res.status(201).json({
@@ -493,4 +494,25 @@ function generateOTP() {
     return Math.floor(1000 + Math.random() * 9000).toString();
   }
   
+  function sendMessage()
+  {
+    
+    axios({
+    method: 'post',
+    url: 'http://sms.pushpaksms.com/api_v2/message/send',
+    headers: {
+        'authorization': 'Bearer XmgntBRMzBWfOffR-Jf8udKbeagXWqZ-5W3XVcmemRp8KE4BFmQlpPXXqh4tJ31y',
+        'cache-control': 'no-cache',
+        'content-type': 'application/x-www-form-urlencoded'
+    },
+    data: 'sender_id=JODSMS&message= is%2Cthe%2COTP%2Cverify%2Cyour%2Cmobile%2Cnumber%2Cfor%2C.%2CNEVER%2CSHARE%2CYOUR%2COTP%2CWITH%2CANYONE.%2CJaipur%2CSMS%2CHub%2CPvt%2CLtd&mobile_no=9876543210%2C8058626456'
+    })
+  .then(response => {
+    console.log(response.data);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+
+  }
 module.exports = router;
