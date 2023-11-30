@@ -496,23 +496,25 @@ function generateOTP() {
   
   function sendMessage()
   {
-    
+    const axios = require('axios');
+
     axios({
-    method: 'post',
-    url: 'http://sms.pushpaksms.com/api_v2/message/send',
-    headers: {
+      method: 'post',
+      url: 'http://sms.pushpaksms.com/api_v2/message/send',
+      headers: {
         'authorization': 'Bearer XmgntBRMzBWfOffR-Jf8udKbeagXWqZ-5W3XVcmemRp8KE4BFmQlpPXXqh4tJ31y',
         'cache-control': 'no-cache',
         'content-type': 'application/x-www-form-urlencoded'
-    },
-    data: 'sender_id=RATNMT&message=Dear {#var#} ONLINE PLAY One click pay/widrol Fast Response {#var#} suprot {#var#} -GDM&mobile_no=8058626456'
+      },
+      data: 'sender_id=BLKSMS&message=YOUR_MESSAGE&mobile_no=8058626456'
     })
-  .then(response => {
-    console.log(response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    
 
   }
 module.exports = router;
