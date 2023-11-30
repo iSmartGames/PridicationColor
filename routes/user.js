@@ -515,10 +515,11 @@ function generateOTP() {
         }
       });
       
-      console.log(response.data); // Log the response data
+      //console.log(response.data); 
+      // Log the response data
       return "1";
     } catch (error) {
-      console.error('Error:', error);
+      //console.error('Error:', error);
       return "0";
     }
   }
