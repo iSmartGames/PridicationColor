@@ -505,7 +505,7 @@ function generateOTP() {
         'cache-control': 'no-cache',
         'content-type': 'application/x-www-form-urlencoded'
     },
-    data: 'sender_id=JODSMS&message=1234 is the OTP verify your mobile number for 8741844917. NEVER SHARE YOUR OTP WITH ANYONE.\n\nJaipur SMS Hub Pvt Ltd&mobile_no=8058626456'
+    data: 'sender_id=RATNMT&message=Dear {#var#} ONLINE PLAY One click pay/widrol Fast Response {#var#} suprot {#var#} -GDM&mobile_no=8058626456'
     })
   .then(response => {
     console.log(response.data);
