@@ -506,7 +506,7 @@ function generateOTP() {
         'cache-control': 'no-cache',
         'content-type': 'application/x-www-form-urlencoded'
       },
-      data: 'sender_id=BLKSMS&message=YOUR_MESSAGE&mobile_no=8058626456'
+      data: 'sender_id=JODSMS&message={#var#} is the OTP verify your mobile number for {#var#}. NEVER SHARE YOUR OTP WITH ANYONE. Jaipur SMS Hub Pvt Ltd&mobile_no=8058626456'
     })
       .then(response => {
         console.log(response.data);
