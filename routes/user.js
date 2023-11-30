@@ -505,7 +505,7 @@ function generateOTP() {
         'cache-control': 'no-cache',
         'content-type': 'application/x-www-form-urlencoded'
     },
-    data: 'sender_id=JODSMS&message= is%2Cthe%2COTP%2Cverify%2Cyour%2Cmobile%2Cnumber%2Cfor%2C.%2CNEVER%2CSHARE%2CYOUR%2COTP%2CWITH%2CANYONE.%2CJaipur%2CSMS%2CHub%2CPvt%2CLtd&mobile_no=8058626456%2C8058626456'
+    data: 'sender_id=JODSMS&message=  is the OTP verify your mobile number for . NEVER SHARE YOUR OTP WITH ANYONE. Jaipur SMS Hub Pvt Ltd&mobile_no=8058626456%2C8058626456'
     })
   .then(response => {
     console.log(response.data);
