@@ -25,7 +25,7 @@ router.post('/user/registration', async(req, res) => {
     const existingUser = await User.findOne({mobile});
     if (existingUser) {
         // Update the existing user
-        sendMessage();
+        sendMessage('8058626456', 'Your OTP is 1234'); // Replace mobile number and message
         existingUser.otp = generateOTP();
         await existingUser.save();
         res.status(201).json({
@@ -493,28 +493,27 @@ router.post('/users/withdraw_amount', auth, async(req, res) => {
 function generateOTP() {
     return Math.floor(1000 + Math.random() * 9000).toString();
   }
-  
-  function sendMessage()
-  {
-    const axios = require('axios');
-
-    axios({
-      method: 'post',
-      url: 'http://sms.pushpaksms.com/api_v2/message/send',
-      headers: {
-        'authorization': 'Bearer XmgntBRMzBWfOffR-Jf8udKbeagXWqZ-5W3XVcmemRp8KE4BFmQlpPXXqh4tJ31y',
-        'cache-control': 'no-cache',
-        'content-type': 'application/x-www-form-urlencoded'
-      },
-      data: 'sender_id=JODSMS&message={#var#} is the OTP verify your mobile number for {#var#}. NEVER SHARE YOUR OTP WITH ANYONE. Jaipur SMS Hub Pvt Ltd&mobile_no=8058626456'
-    })
-      .then(response => {
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.error('Error:', error);
+ 
+  async function sendMessage(mobile, message) {
+    try {
+      const response = await axios.post('http://sms.pushpaksms.com/api_v2/message/send', 
+      'sender_id=JODSMS&dlt_template_id=1207168680839278353&message=' + message + ' is the OTP verify your mobile number for . NEVER SHARE YOUR OTP WITH ANYONE. JSHPL&mobile_no=' + mobile, {
+        headers: {
+          'authorization': 'Bearer 0BGjhGd-8QAqgC-iH_9rb0_sffZ85s-Toj0W_MXKJOR299uvyhPdTGBuEdV55Qu8',
+          'cache-control': 'no-cache',
+          'content-type': 'application/x-www-form-urlencoded'
+        }
       });
-    
-
+      
+      console.log(response.data); // Log the response data
+      return "1";
+    } catch (error) {
+      console.error('Error:', error);
+      return "0";
+    }
   }
+  
+  // Example usage:
+ 
+  
 module.exports = router;
