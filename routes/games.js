@@ -6,11 +6,13 @@ const auth = require('../middleware/auth')
 const Games = require('../models/games')
 const User = require('../models/user')
 const GameBid = require('../models/gameBid')
-const Wallet = require('../models/wallet')
-// Update settings
+const Wallet = require('../models/wallet');
+const GameResult = require("../models/gameResult");
 
+// socketio service
+//const { app, io, cors, server } = require('../services/socketio');
 
-// Update settings
+// Get Running Game
 router.get('/games/getgames',auth, async(req, res) => {
   
     const games = await Games.findOne({status: 1,});
@@ -40,6 +42,7 @@ router.post('/games/playgames',auth, async(req, res) => {
       status: "fail", 
       msg:"Sufficient Points Not available",
     });
+    return;
   }
 
   var game = await Games.findOne({ _id: req.body.gameid, });
@@ -49,6 +52,7 @@ router.post('/games/playgames',auth, async(req, res) => {
       status: "fail", 
       msg:"Game is Not Active",
     });
+    return;
   }
 
   if(new Date(game.bidstoptime)<new Date())
@@ -57,6 +61,7 @@ router.post('/games/playgames',auth, async(req, res) => {
       status: "fail", 
       msg:"Game is Stop Bid",
     });
+    return;
   }
 
 
@@ -98,10 +103,62 @@ await user.save();
  
 });
 
+// Get Orders or Bids - Today - with date
+router.get('/games/getorders',auth, async(req, res) => {
+  
+  const games = await Games.findOne({status: 1,});
+  if (games) {
+      res.status(201).json({
+        status: "success", 
+        data:games,
+      });
+    } 
+    else
+    {
+
+
+    }
+
+ 
+});
+
+//Get Today Result
+router.get('/games/gettodayresult',auth, async(req, res) => {
+  
+   // Get today's date
+   const today = new Date();
+   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+   const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+   // Find documents where a date field matches today's date
+   const documents = await GameResult.find({
+    createdAt: {
+       $gte: startOfToday,
+       $lt: endOfToday
+     }
+   });
+
+  if (documents.length!=0) {
+      res.status(200).json({
+        status: "success", 
+        data:documents,
+      });
+    }
+    else{
+      res.status(400).json({
+        status: "Not Found",
+      });
+    }
+});
+
+
+
 // Function to generate a random OTP
 function generaterendom() {
   return Math.floor(10000 + Math.random() * 90000).toString();
 }
+
+
 
 /*
 function generateRandomString(length) {
@@ -114,4 +171,5 @@ function generateRandomString(length) {
   return result;
 }
 */
+
 module.exports = router;

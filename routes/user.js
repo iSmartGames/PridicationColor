@@ -25,12 +25,12 @@ router.post('/user/registration', async(req, res) => {
     const existingUser = await User.findOne({mobile});
     if (existingUser) {
         // Update the existing user
-        const otp = generateOTP();
+        const otp = 1234;
         
         existingUser.otp = otp;
         await existingUser.save();
 
-        sendMessage(mobile, 'Your OTP is '+otp); // Replace mobile number and message
+      //  sendMessage(mobile, 'Your OTP is '+otp); // Replace mobile number and message
 
         res.status(201).json({
           status: "success", 
@@ -40,7 +40,7 @@ router.post('/user/registration', async(req, res) => {
         });
       } else {
 
-        const otp = generateOTP();
+        const otp = 1234;
 
         const newUser = await User.create({
             ...req.body,
@@ -48,7 +48,7 @@ router.post('/user/registration', async(req, res) => {
         });
         await newUser.generateAuthToken();
 
-        sendMessage(mobile, 'Your OTP is '+otp); // Replace mobile number and message
+       // sendMessage(mobile, 'Your OTP is '+otp); // Replace mobile number and message
 
         res.status(201).json({
             status: "success", 
