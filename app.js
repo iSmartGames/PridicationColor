@@ -5,7 +5,7 @@ const session = require('express-session')
 const dotenv = require('dotenv').config()
 const mongoose = require('./db/mongoose')
 const fileUpload = require('express-fileupload');
-
+const moment = require('moment-timezone');
 // socketio service
 const { app, io, cors, server } = require('./services/socketio')
 
@@ -29,6 +29,19 @@ const AdminUserRouter = require('./routes/admin/users')
 const AdminBattleRouter = require('./routes/admin/battles')
 const AdminGameRouter = require('./routes/admin/games')
 
+//matka
+const MatkaAdminGameRouter = require('./routes/matka/matkaadmin/matkagameadmin')
+const MatkaGameRouter = require('./routes/matka/matkagames')
+
+
+
+//Star Line matka
+const StarLineAdminGameRouter = require('./routes/matka/matkaadmin/starlinegameadmin')
+const StarlineGameRouter = require('./routes/matka/starlinegames')
+
+
+
+
 const PORT = process.env.PORT || 3000
 
 
@@ -43,6 +56,15 @@ app.use(AdminRouter)
 app.use(AdminUserRouter)
 app.use(AdminBattleRouter)
 app.use(AdminGameRouter)
+
+//matka routes
+app.use(MatkaGameRouter)
+app.use(MatkaAdminGameRouter)
+
+
+//Star Line matka routes
+app.use(StarLineAdminGameRouter)
+app.use(StarlineGameRouter)
 
 
 

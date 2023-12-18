@@ -16,15 +16,16 @@ const Logger = require("nodemon/lib/utils/log");
 
 // status - 1 Active, 2-Not Active, 3-closed
 
-const cron = require('node-cron');
+//const cron = require('node-cron');
 // Schedule the cron job to run every minute
-cron.schedule('*/1 * * * * *', () => {
-  CronCreateGames();
-  });
-
-  cron.schedule('*/10 * * * * *', () => {
-    CronResultDeclear();
-    });
+//
+//cron.schedule('*/1 * * * * *', () => {
+//  CronCreateGames();
+//  });
+//
+ // cron.schedule('*/10 * * * * *', () => {
+ //   CronResultDeclear();
+ //   });
 // Game Create
 router.post('/games/create', async(req, res) => {
 /*
@@ -606,8 +607,8 @@ async function distrubatepoint(document,updateAmount) {
  
   function generateUniqueID() {
     const timestamp = new Date().getTime(); // Get current timestamp
-    const randomPart = Math.floor(Math.random() * 100); // Generate random number (you can adjust the range as needed)
-    
+    const randomPart = Math.floor(Math.random() * 100);
+     // Generate random number (you can adjust the range as needed)
     return `${timestamp}`;
   }
   
