@@ -8,6 +8,40 @@ const MatkaGamePrice = require("../../../models/matka/matkagameprice");
 const MatkaBids = require("../../../models/matka/matkabids");
 const Wallet = require("../../../models/wallet");
 const User = require("../../../models/user");
+const Banner = require("../../../models/matka/banner");
+
+// Matka App Banner Text - Image Enter
+router.post('/matkagame/banner', async(req, res) => {
+
+  var game = await Banner.findOne();
+  if(game==null)
+  {
+
+    var game = await Banner.create({
+      bannernotice: req.body.bannernotice,
+      bannerimage:req.body.bannerimage,
+    });
+  }
+  else
+  {
+
+    const settings = {
+      bannernotice: req.body.bannernotice,
+      bannerimage:req.body.bannerimage,
+  }
+  var game = await Banner.findOneAndUpdate({ _id: game._id }, settings)
+  }
+
+    res.status(400).json({
+      msg:"Succesfull",
+      game:game,
+    });
+
+  });
+
+
+
+
 // Matka Game Create
 router.post('/matkagame/create', async(req, res) => {
 

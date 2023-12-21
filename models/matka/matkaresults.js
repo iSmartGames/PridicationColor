@@ -42,6 +42,7 @@ const gamesSchema = new mongoose.Schema({
         type: String,
       },
       gameDate: {
+        required: true,
         type: Date,
       },
 }, {

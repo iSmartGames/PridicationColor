@@ -8,97 +8,102 @@ const MatkaBids = require("../../models/matka/matkabids");
 const moment = require('moment-timezone');
 const Wallet = require("../../models/wallet");
 const User = require("../../models/user");
+const Banner = require("../../models/matka/banner");
+const MatkaResults = require("../../models/matka/matkaresults");
+const { MongoClient, ObjectId } = require('mongodb');
 
 // Get Matka Running Game
 router.get('/matkagame/getmatkagame',auth, async(req, res) => {
-  /*
-    const games = await MatkaGames.find({status: 1,});
-
-
-
-    if (games) {
-        res.status(201).json({
-          status: "success", 
-          data:games,
-        });
-      } 
-      else
-      {
  
-        res.status(2002).json({
-            status: "fail", 
-          });
-      }
-*/
         // Get the current date
-        const currentDate = new Date();
+        const today = new Date();
         // Set the time to the beginning of the day
-        currentDate.setHours(0, 0, 0, 0);
-/*
+        today.setHours(0, 0, 0, 0);
 
-      const battle = await MatkaGames.aggregate([{
-        $match: {status: 1,}
-    },
-    {
-      $lookup: {
-        from: "matkagames",
-        localField: "game_id", // Field from the products collection
-        foreignField: "_id", // Field from the orders collection
-        as: "related_orders"
-      }
-   
-    },
-          ]).exec() .catch(err => {
-           
-          });
-*/
-
-
-const battle = await MatkaGames.aggregate([
-  {
-    $lookup: {
-      from: "matkaresults",
-      localField: "_id", // Field from the products collection
-      foreignField: "game_id", // Field from the orders collection
-      as: "matkaresult"
-    }
-  }
-  
-]);
-
+        const battle = await MatkaGames.aggregate([
+          {
+            $lookup: {
+              from: "matkaresults",
+              localField: "_id", // Field from the products collection
+              foreignField: "game_id",
+              pipeline: [
+                {
+                  $match:{
+                 createdAt: {
+                    $gte: today, // Greater than or equal to today's start
+                    $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Less than tomorrow's start
+                  }
+                }
+                   }], // Field from the orders collection
+              as: "matkaresult"
+            }
+          }
+          
+        ]);
           res.status(201).json({
             status: "success", 
             data:battle,
           });
-
-
-   
 });
 
+// Get Matka App Banner-Text
+router.get('/matkagame/banner',auth, async(req, res) => {
+  var game = await Banner.findOne();
+  if(game==null)
+  {
+    res.status(202).json(game);
+  }else{
+    res.status(200).json(game);
+  }
 
+});
 
 // Get Matka Game Status
 router.post('/matkagame/getmatkagamestatus',auth, async(req, res) => {
-  
-  const games = await MatkaGames.find({gameId: req.body.gameId,});
+  try {
 
-  if (games) {
-      res.status(201).json({
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+const battle = await MatkaGames.aggregate([
+            {
+
+              $match: {
+                _id: new ObjectId(req.body._id)
+              },
+            },
+
+              {
+              $lookup: {
+                from: "matkaresults",
+                localField: "_id", // Field from the products collection
+                foreignField: "game_id",
+                pipeline: [
+                  {
+                    $match:{
+                    createdAt: {
+                      $gte: today, // Greater than or equal to today's start
+                      $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Less than tomorrow's start
+                    }
+                  }
+                    }], // Field from the orders collection
+                as: "matkaresult"
+              }
+            }
+           
+            ]);
+
+      res.status(200).json({
         status: "success", 
-        data:games,
+        data:battle,
       });
-    } 
-    else
-    {
 
-      res.status(2002).json({
-          status: "fail", 
-        });
-    }
+  } catch (error) {
+    console.error('Error occurred:', error);
+    return error; // Handle or return the error as required
+  } 
 
- 
 });
-
 
 
 // Get Matka playmatka game
@@ -385,6 +390,20 @@ res.status(200).json({
 } catch (error) {
  
 }
+});
+
+// Get Matka Result for Chart
+router.post('/matkagame/matkaresult',auth, async(req, res) => {
+  console.log(req.body._id);
+  var battle = await MatkaResults.find({game_id: new ObjectId(req.body._id)});
+
+    res.status(200).json({
+      status: "success", 
+      msg:"Data Found",
+      data:battle
+    });
+ 
+
 });
 
 // Function to generate a random OTP
