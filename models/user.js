@@ -53,6 +53,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    playstatus: {
+        type: Boolean,
+        default: false,
+    },
     status: {
         type: Boolean,
         default: true,

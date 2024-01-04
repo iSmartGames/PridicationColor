@@ -8,6 +8,7 @@ const User = require('../models/user')
 const GameBid = require('../models/gameBid')
 const Wallet = require('../models/wallet');
 const GameResult = require("../models/gameResult");
+const Battle = require("../models/battle");
 
 // socketio service
 //const { app, io, cors, server } = require('../services/socketio');
@@ -22,14 +23,11 @@ router.get('/games/getgames',auth, async(req, res) => {
           data:games,
         });
       } 
-      else
-      {
- 
-
-      }
-
+     
    
 });
+
+
 
 
 

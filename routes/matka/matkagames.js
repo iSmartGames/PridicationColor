@@ -65,33 +65,33 @@ router.post('/matkagame/getmatkagamestatus',auth, async(req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-const battle = await MatkaGames.aggregate([
-            {
+    const battle = await MatkaGames.aggregate([
+                {
 
-              $match: {
-                _id: new ObjectId(req.body._id)
-              },
-            },
+                  $match: {
+                    _id: new ObjectId(req.body._id)
+                  },
+                },
 
-              {
-              $lookup: {
-                from: "matkaresults",
-                localField: "_id", // Field from the products collection
-                foreignField: "game_id",
-                pipeline: [
                   {
-                    $match:{
-                    createdAt: {
-                      $gte: today, // Greater than or equal to today's start
-                      $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Less than tomorrow's start
-                    }
+                  $lookup: {
+                    from: "matkaresults",
+                    localField: "_id", // Field from the products collection
+                    foreignField: "game_id",
+                    pipeline: [
+                      {
+                        $match:{
+                        createdAt: {
+                          $gte: today, // Greater than or equal to today's start
+                          $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Less than tomorrow's start
+                        }
+                      }
+                        }], // Field from the orders collection
+                    as: "matkaresult"
                   }
-                    }], // Field from the orders collection
-                as: "matkaresult"
-              }
-            }
-           
-            ]);
+                }
+              
+                ]);
 
       res.status(200).json({
         status: "success", 
@@ -111,8 +111,7 @@ router.post('/matkagame/playmatkagame',auth, async(req, res) => {
   
 try {
   
-
-  if(req.user.wallet_amount<req.body.Point)
+  if(req.user.wallet_amount<req.body.totalpoint)
   {
     res.status(202).json({
       status: "fail", 
@@ -162,14 +161,11 @@ try {
   const closehours = closetimestring.substring(0, 2);
   const closeminutes = closetimestring.substring(3);
   const closetimeToCompare = currentTimeIST.clone().set({ hour: closehours, minute: closeminutes, second: 0 });
-
-
   
 
-  if(req.body.gmetype== "1" || req.body.gmetype == "3" || req.body.gmetype == "4" || req.body.gmetype == "5")
+  if(req.body.gmetype== "1" || req.body.gmetype == "3" || req.body.gmetype == "4" || req.body.gmetype == "5" || req.body.gmetype == "8"|| req.body.gmetype == "9")
   {
 
-    console.log("Hello I am ");
     if(req.body.session=='open')
     {
       
@@ -195,12 +191,55 @@ try {
       }
 
     }
-
     
-    
+    const bidsData = JSON.parse(req.body.bids);
+    const result =bidsData.forEach(async (data) => {
+      try {
+          
+        const randomString = generaterendom();
+        console.log("making placing Bid")
+        const placeBid = await MatkaBids.create({
+          bid_id : generaterendom(),
+          game_id: req.body._id,
+          gameId:req.body.gameId,
+          user_id:req.user._id,
+          gamename:req.body.gamename,
+          pana:data.pana,
+          session:req.body.session,
+          digits:data.digit,
+          closedigits:data.closedigits,
+          points:data.Point,
+          bid_date:new Date(),
+          bid_tx_id:randomString,
+          status:1,
+          paystatus:0,
+        });
 
+        const wallet = await Wallet.create({
+          user_id: req.user._id,
+          txn_order:randomString,
+          txn_type:2,
+          amount:data.Point,
+          txnnote:"Matka Bid Placed"
+        
+        });
+        
+        const user = await User.findByIdAndUpdate(req.user._id, { wallet_amount: req.user.wallet_amount-data.Point });
+        
+        console.log(`Successfully inserted: ${placeBid}`);
+      } catch (error) {
+          console.error(`Error inserting data: ${error}`);
+      }
+  });
+
+  res.status(200).json({
+    status: "Success", 
+    msg:"Bid Placed Successfully",
+    placeBid:result,
+  });
+    
+/*
   const randomString = generaterendom();
-  
   console.log("making placing Bid")
   const placeBid = await MatkaBids.create({
     bid_id : generaterendom(),
@@ -218,68 +257,132 @@ try {
     status:1,
     paystatus:0,
   });
-
-
+*/
 
   }
 
-  if(req.body.gmetype== "2")
+  if(req.body.gmetype== "2" )
   {
-    if (currentTimeIST.isAfter(closetimeToCompare, 'minute')) {
+    if (currentTimeIST.isAfter(opentimeToCompare, 'minute')) {
       res.status(202).json({
         status: "fail", 
-        msg:"Close Session Closed"
+        msg:"Market Bid Closed for Jodi"
       });
       return;
     }
 
+ 
+    const bidsData = JSON.parse(req.body.bids);
+    const result =bidsData.forEach(async (data) => {
+      try {
+          
+        const randomString = generaterendom();
+        console.log("making placing Bid")
+        const placeBid = await MatkaBids.create({
+          bid_id : generaterendom(),
+          game_id: req.body._id,
+          gameId:req.body.gameId,
+          user_id:req.user._id,
+          gamename:req.body.gamename,
+          pana:data.pana,
+          digits:data.digit,
+          closedigits:data.closedigits,
+          points:data.Point,
+          bid_date:new Date(),
+          bid_tx_id:randomString,
+          status:1,
+          paystatus:0,
+        });
 
-    
-  const randomString = generaterendom();
-  
-  console.log("making placing Bid")
-  const placeBid = await MatkaBids.create({
-    bid_id : generaterendom(),
-    game_id: req.body._id,
-    gameId:req.body.gameId,
-    user_id:req.user._id,
-    gamename:req.body.gamename,
-    pana:req.body.pana,
-    digits:req.body.digit,
-    closedigits:req.body.closedigits,
-    points:req.body.Point,
-    bid_date:new Date(),
-    bid_tx_id:randomString,
-    status:1,
-    paystatus:0,
+        const wallet = await Wallet.create({
+          user_id: req.user._id,
+          txn_order:randomString,
+          txn_type:2,
+          amount:data.Point,
+          txnnote:"Matka Bid Placed"
+        
+        });
+        
+        const user = await User.findByIdAndUpdate(req.user._id, { wallet_amount: req.user.wallet_amount-data.Point });
+        
+        console.log(`Successfully inserted: ${placeBid}`);
+      } catch (error) {
+          console.error(`Error inserting data: ${error}`);
+      }
   });
 
-
-//Update Wallet After Bid
-  
-const wallet = await Wallet.create({
-  user_id: req.user._id,
-  txn_order:randomString,
-  txn_type:2,
-  amount:req.body.Point,
-  txnnote:"Matka Bid Placed"
-
-});
-
-const user = await User.findByIdAndUpdate(req.user._id, { wallet_amount: req.user.wallet_amount-req.body.Point });
-res.status(200).json({
-  status: "Success", 
-  msg:"Bid Placed Successfully",
-  placeBid:user.wallet_amount,
-});
+  res.status(200).json({
+    status: "Success", 
+    msg:"Bid Placed Successfully",
+    placeBid:result,
+  });
+    
 
   }
 
 
+  if(req.body.gmetype== "6" )
+  {
+    if (currentTimeIST.isAfter(opentimeToCompare, 'minute')) {
+      res.status(202).json({
+        status: "fail", 
+        msg:"Market Bid Closed for Jodi"
+      });
+      return;
+    }
+
+    const bidsData = JSON.parse(req.body.bids);
+    const result =bidsData.forEach(async (data) => {
+      try {
+        const randomString = generaterendom();
+        console.log("making placing Bid")
+        const placeBid = await MatkaBids.create({
+          bid_id : generaterendom(),
+          game_id: req.body._id,
+          gameId:req.body.gameId,
+          user_id:req.user._id,
+          gamename:req.body.gamename,
+          pana:data.pana,
+          digits:data.digit,
+          closedigits:data.closedigits,
+          session:req.body.session,
+          points:data.Point,
+          bid_date:new Date(),
+          bid_tx_id:randomString,
+          status:1,
+          paystatus:0,
+        });
+
+        const wallet = await Wallet.create({
+          user_id: req.user._id,
+          txn_order:randomString,
+          txn_type:2,
+          amount:data.Point,
+          txnnote:"Matka Bid Placed"
+        
+        });
+        
+        const user = await User.findByIdAndUpdate(req.user._id, { wallet_amount: req.user.wallet_amount-data.Point });
+        console.log(`Successfully inserted: ${placeBid}`);
+      } catch (error) {
+          console.error(`Error inserting data: ${error}`);
+      }
+  });
+
+  res.status(200).json({
+    status: "Success", 
+    msg:"Bid Placed Successfully",
+    placeBid:result,
+  });
+   
+}
+
+
+
+/*
   if(req.body.gmetype== "6")
   {
 
-    console.log("Hello I am ");
     if(req.body.session=='open')
     {
       
@@ -310,7 +413,6 @@ res.status(200).json({
     
 
   const randomString = generaterendom();
-  
   console.log("making placing Bid")
   const placeBid = await MatkaBids.create({
     bid_id : generaterendom(),
@@ -330,12 +432,13 @@ res.status(200).json({
   });
 
 
-
   }
+*/
+
 
   if(req.body.gmetype== "7")
   {
-    if (currentTimeIST.isAfter(closetimeToCompare, 'minute')) {
+    if (currentTimeIST.isAfter(opentimeToCompare, 'minute')) {
       res.status(202).json({
         status: "fail", 
         msg:"Close Session Closed"
@@ -343,47 +446,52 @@ res.status(200).json({
       return;
     }
 
+  const bidsData = JSON.parse(req.body.bids);
+  const result =bidsData.forEach(async (data) => {
+    try {
+        
+      const randomString = generaterendom();
+      console.log("making placing Bid")
+      const placeBid = await MatkaBids.create({
+        bid_id : generaterendom(),
+        game_id: req.body._id,
+        gameId:req.body.gameId,
+        user_id:req.user._id,
+        gamename:req.body.gamename,
+        pana:data.pana,
+        digits:data.digit,
+        closedigits:data.closedigits,
+        points:data.Point,
+        bid_date:new Date(),
+        bid_tx_id:randomString,
+        status:1,
+        paystatus:0,
+      });
 
-    
-  const randomString = generaterendom();
-  
-  console.log("making placing Bid")
-  const placeBid = await MatkaBids.create({
-    bid_id : generaterendom(),
-    game_id: req.body._id,
-    gameId:req.body.gameId,
-    user_id:req.user._id,
-    gamename:req.body.gamename,
-    pana:req.body.pana,
-    digits:req.body.digit,
-    closedigits:req.body.closedigits,
-    points:req.body.Point,
-    bid_date:new Date(),
-    bid_tx_id:randomString,
-    status:1,
-    paystatus:0,
-  });
-
-
-//Update Wallet After Bid
-  
-const wallet = await Wallet.create({
-  user_id: req.user._id,
-  txn_order:randomString,
-  txn_type:2,
-  amount:req.body.Point,
-  txnnote:"Matka Bid Placed"
-
+      const wallet = await Wallet.create({
+        user_id: req.user._id,
+        txn_order:randomString,
+        txn_type:2,
+        amount:data.Point,
+        txnnote:"Matka Bid Placed"
+      
+      });
+      
+      const user = await User.findByIdAndUpdate(req.user._id, { wallet_amount: req.user.wallet_amount-data.Point });
+      
+      console.log(`Successfully inserted: ${placeBid}`);
+    } catch (error) {
+        console.error(`Error inserting data: ${error}`);
+    }
 });
 
-const user = await User.findByIdAndUpdate(req.user._id, { wallet_amount: req.user.wallet_amount-req.body.Point });
 res.status(200).json({
   status: "Success", 
   msg:"Bid Placed Successfully",
-  placeBid:user.wallet_amount,
+  placeBid:result,
 });
-
-  }
+  
+}
 
 
 
@@ -407,8 +515,10 @@ router.post('/matkagame/matkaresult',auth, async(req, res) => {
 });
 
 // Function to generate a random OTP
+
 function generaterendom() {
-  return Math.floor(1000000 + Math.random() * 9000000).toString();
+  const timestamp = new Date().getTime();
+  return `${timestamp}`;
 }
 
 module.exports = router;

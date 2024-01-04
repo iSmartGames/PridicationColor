@@ -9,6 +9,14 @@ const MatkaBids = require("../../../models/matka/matkabids");
 const Wallet = require("../../../models/wallet");
 const User = require("../../../models/user");
 const Banner = require("../../../models/matka/banner");
+const moment = require('moment-timezone');
+const multer = require('multer');
+
+
+const cron = require('node-cron');
+cron.schedule('*/1 * * * * *', () => {
+  marketstatuscheck();
+  });
 
 // Matka App Banner Text - Image Enter
 router.post('/matkagame/banner', async(req, res) => {
@@ -40,12 +48,12 @@ router.post('/matkagame/banner', async(req, res) => {
   });
 
 
-
-
 // Matka Game Create
 router.post('/matkagame/create', async(req, res) => {
 
-    console.log("hello")
+  const daysArray = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  //const document = { marketworkday: daysArray };
+    
     var game = await MatkaGames.create({
         gameId: generateUniqueID(),
         opentime: req.body.opentime,
@@ -53,7 +61,7 @@ router.post('/matkagame/create', async(req, res) => {
         gamename:req.body.gamename,
         status:1,
         marketstatus:1,
-        marketoffday:1,
+        marketworkday:daysArray
     });
 
       res.status(400).json({
@@ -269,5 +277,89 @@ if (result.upsertedCount > 0) {
         const timestamp = new Date().getTime();
         return `${timestamp}`;
       }
+
+
+     async function marketstatuscheck()
+      {
+       
+        const currentTimeInIndia = moment().tz('Asia/Kolkata'); // Get current time in Indian Local Time
+        const currentTimeInUTC = currentTimeInIndia.clone().utc(); // Convert to UTC
+        
+        const currtime  = currentTimeInUTC.toDate();
+     
+        const dateObject = new Date(currtime);
+ 
+        const hours = dateObject.getHours().toString().padStart(2, '0');
+        const minutes = dateObject.getMinutes().toString().padStart(2, '0');
+        
+        const time = hours+":"+minutes;
+
+
+      const result =   await MatkaGames.findOneAndUpdate({
+        $and: [
+          { marketstatus: 1 }, // Condition 1: field1 equals value1
+          { closetime: {
+            $lt: time
+          },
+         }, // Condition 2: field2 greater than value2
+          
+          // Add more conditions if needed...
+        ]
+      },
+      { $set: { marketstatus: 0 } },
+      )
+
+      console.log(result);
+      //exit;
+
+/*
+        const result =   await MatkaGames.aggregate([
+          {
+            $match: {
+              closetime: {
+                $gt: time
+              },
+              marketstatus : 1,
+            }
+          }
+        ])
+        */
+      }
+
+
+      // Set up Multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads'); // Destination folder for uploaded files
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname); // File name in the destination folder
+  },
+});
+
+const upload = multer({ storage });
+
+
+// Handle image upload endpoint
+router.post('/matkagame/upload', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // Save image path to MongoDB
+    const newImage = new Banner({
+      bannerimage: req.file.path,
+    });
+
+    await newImage.save();
+
+    res.status(201).json({ message: 'Image uploaded successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error uploading image' });
+  }
+});
+
+
 
 module.exports = router;
