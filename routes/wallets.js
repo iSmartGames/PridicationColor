@@ -11,13 +11,16 @@ const mongoose = require("mongoose")
 // socketio service
 //const { app, io, cors, server } = require('../services/socketio')
 
+//----- txn_type 1- Credit 
+//----- amount_status 1-UPI ,2 -RazorPay Add, 3 - Game Win , 4 - Bonus Amount, 6-Refer Amount, 7 - matka Win ,8- Add by admin
+
+
+//----- txn_type 2 -Debit
+//----- amount_status  10 - withdraw Request, 11 -withdraw, 12 - matka Bid Place ,13- withdraw by admin
 
 
 // Add wallet Amount
 router.post('/wallet/add', auth, async(req, res) => {
-//----- txn_type 1- Credit ,2 -Debit
-//----- amount_status 1-UPI ,2 -RazorPay Add, 3 - Game Win , 4 - Bonus Amount, 6-Refer Amount
-
     var wallet = await Wallet.create({
         user_id: req.user._id,
         txn_order:genTxnId(),
@@ -212,11 +215,79 @@ router.get('/wallet/transactions', auth, async(req, res) => {
 })
 
 
+
+// Wallet Add History pointaddhistory
+router.get('/wallet/pointaddhistory', auth, async(req, res) => {
+    try {
+        const wallet = await Wallet.find({ $and: [
+            {user_id: req.user._id},
+            {txn_type:1},
+            {
+                $or: [
+                    { amount_status: 1 }, // Condition 3A: field3 equals value3
+                    { amount_status: 2 },
+                    { amount_status: 4},
+                    { amount_status: 6 },
+                    { amount_status: 8 },
+                  ]
+            }
+        ]}
+            )
+
+            console.log(wallet);
+        var response = {
+            msg: "Success",
+            data: wallet,
+        }
+        res.status(201).send(response)
+        //console.log(wallet);
+    } catch (e) {
+        var response = {
+            msg: "Failed to fetch record",
+            error: e,
+        }
+        res.status(204).send(response)
+    }
+})
+
+
+// Wallet Add History pointaddhistory
+router.get('/wallet/pointwidrowhistory', auth, async(req, res) => {
+    try {
+        const wallet = await Wallet.find({ $and: [
+            {user_id: req.user._id},
+            {txn_type:2},
+            {
+                $or: [
+                    { amount_status: 10 }, // Condition 3A: field3 equals value3
+                    { amount_status: 11 },
+                    { amount_status: 13 },
+                  ]
+            }
+        ]}
+            )
+
+            console.log(wallet);
+        var response = {
+            msg: "Success",
+            data: wallet,
+        }
+        res.status(201).send(response)
+        //console.log(wallet);
+    } catch (e) {
+        var response = {
+            msg: "Failed to fetch record",
+            error: e,
+        }
+        res.status(204).send(response)
+    }
+})
+
+
+
 // Widrow wallet Amount
 router.post('/wallet/widrow', auth, async(req, res) => {
-    //----- txn_type 1- Credit ,2 -Debit
-    //----- amount_status 1-UPI ,2 -RazorPay Add, 3 - Game Win , 4 - Bonus Amount, 6-Refer Amount , 7- widrow amount pending
-
+ 
     var user = await User.findOne({ _id: req.user._id, })
     if (user.wallet_amount >= req.body.amount) {
 
@@ -224,7 +295,7 @@ router.post('/wallet/widrow', auth, async(req, res) => {
             user_id: req.user._id,
             txn_order:genTxnId(),
             txn_type:2,
-            amount_status:7,
+            amount_status:10,
             amount: req.body.amount,
             txnnote:"WTHDRAW REQUEST",
             currency: "INR",

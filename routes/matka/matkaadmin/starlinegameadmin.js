@@ -8,12 +8,11 @@ const StarLinegames = require("../../../models/matka/starlinegames");
 // Matka Game Create
 router.post('/starline/create', async(req, res) => {
 
-    console.log("hello")
+
     var game = await StarLinegames.create({
         gameId: generateUniqueID(),
         opentime: req.body.opentime,
-        closetime: req.body.closetime,
-        gamename:req.body.gamename,
+        gamename:req.body.opentime,
         status:1,
         marketstatus:1,
         marketoffday:1,

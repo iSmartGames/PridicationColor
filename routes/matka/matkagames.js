@@ -14,11 +14,9 @@ const { MongoClient, ObjectId } = require('mongodb');
 
 // Get Matka Running Game
 router.get('/matkagame/getmatkagame',auth, async(req, res) => {
- 
-        // Get the current date
-        const today = new Date();
-        // Set the time to the beginning of the day
-        today.setHours(0, 0, 0, 0);
+
+const utcDate =moment().tz("Asia/Kolkata").format();
+const matchDate = new Date(moment(utcDate).startOf('day').toISOString());
 
         const battle = await MatkaGames.aggregate([
           {
@@ -29,17 +27,15 @@ router.get('/matkagame/getmatkagame',auth, async(req, res) => {
               pipeline: [
                 {
                   $match:{
-                 createdAt: {
-                    $gte: today, // Greater than or equal to today's start
-                    $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Less than tomorrow's start
+                    gameDate: matchDate                 
                   }
-                }
                    }], // Field from the orders collection
               as: "matkaresult"
             }
           }
           
         ]);
+        
           res.status(201).json({
             status: "success", 
             data:battle,
@@ -61,10 +57,8 @@ router.get('/matkagame/banner',auth, async(req, res) => {
 // Get Matka Game Status
 router.post('/matkagame/getmatkagamestatus',auth, async(req, res) => {
   try {
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
+    const utcDate =moment().tz("Asia/Kolkata").format();
+    const matchDate = new Date(moment(utcDate).startOf('day').toISOString());
     const battle = await MatkaGames.aggregate([
                 {
 
@@ -80,12 +74,9 @@ router.post('/matkagame/getmatkagamestatus',auth, async(req, res) => {
                     foreignField: "game_id",
                     pipeline: [
                       {
-                        $match:{
-                        createdAt: {
-                          $gte: today, // Greater than or equal to today's start
-                          $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Less than tomorrow's start
-                        }
-                      }
+                       $match:{
+                    gameDate: matchDate                 
+                  }
                         }], // Field from the orders collection
                     as: "matkaresult"
                   }
@@ -106,11 +97,10 @@ router.post('/matkagame/getmatkagamestatus',auth, async(req, res) => {
 });
 
 
-// Get Matka playmatka game
+// POST Play Matka playmatka game
 router.post('/matkagame/playmatkagame',auth, async(req, res) => {
-  
 try {
-  
+ 
   if(req.user.wallet_amount<req.body.totalpoint)
   {
     res.status(202).json({
@@ -189,7 +179,6 @@ try {
         });
         return;
       }
-
     }
     
     const bidsData = JSON.parse(req.body.bids);
@@ -219,6 +208,7 @@ try {
           user_id: req.user._id,
           txn_order:randomString,
           txn_type:2,
+          amount_status:12,
           amount:data.Point,
           txnnote:"Matka Bid Placed"
         
@@ -513,6 +503,84 @@ router.post('/matkagame/matkaresult',auth, async(req, res) => {
  
 
 });
+
+
+//Get Matka Result - Name - for Result
+router.post('/matkagame/matkaresulthistory',auth, async(req, res) => {
+// Assuming 'istDateString' is the IST date string received from the Android app
+moment.suppressDeprecationWarnings = true;
+const utcDate = moment.tz(req.body.decleredate, 'Asia/Kolkata').utc().format();
+const dateupdate = moment(utcDate).startOf('day').toISOString();
+  const battle = await MatkaGames.aggregate([
+    {
+      $lookup: {
+        from: "matkaresults",
+        localField: "_id", // Field from the products collection
+        foreignField: "game_id",
+        pipeline: [
+          {
+            $match:{
+              gameDate: new Date(dateupdate),
+          }
+             }], // Field from the orders collection
+        as: "matkaresult"
+      }
+    }
+    
+  ]);
+  
+    res.status(201).json({
+      status: "success", 
+      data:battle,
+    });
+    
+});
+
+
+// Get Matka Game Bid History 
+router.post('/matkagame/matkagamehistory',auth, async(req, res) => {
+
+  const battle = await MatkaBids.aggregate([{
+    $match: {
+      user_id : new ObjectId(req.user._id),
+    }
+},
+{
+  $lookup: {
+    from: "wallets",
+    localField: "bid_tx_id",
+    foreignField: "txn_order",
+    as: "matkabid"
+  }
+},
+{
+  $lookup: {
+    from: "wallets",
+    localField: "resultpaytoken",
+    foreignField: "txn_order",
+    as: "matkawin"
+  }
+},
+  ]);
+
+  /*console.log(req.body._id);
+  var battle = await MatkaResults.find({game_id: new ObjectId(req.body._id)});
+
+    res.status(200).json({
+      status: "success", 
+      msg:"Data Found",
+      data:battle
+    });
+ */
+
+    res.status(200).json({
+      status: "success", 
+      msg:"Data Found",
+      data:battle
+    });
+
+});
+
 
 // Function to generate a random OTP
 

@@ -12,7 +12,6 @@ const gamesSchema = new mongoose.Schema({
         type: String,
       },
       closetime: {
-        required: true,
         type: String,
       },
       gamename: {
@@ -32,8 +31,8 @@ const gamesSchema = new mongoose.Schema({
         type: Number,
         default: 0,
       },
-      marketoffday: {
-        type: String,
+      marketworkday: {
+        type: Array,
       },
       
 }, {

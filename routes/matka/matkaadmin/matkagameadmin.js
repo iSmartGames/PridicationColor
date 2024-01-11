@@ -18,7 +18,9 @@ cron.schedule('*/1 * * * * *', () => {
   marketstatuscheck();
   });
 
-// Matka App Banner Text - Image Enter
+
+  
+/* Matka App Banner Text - Image Enter */
 router.post('/matkagame/banner', async(req, res) => {
 
   var game = await Banner.findOne();
@@ -48,7 +50,7 @@ router.post('/matkagame/banner', async(req, res) => {
   });
 
 
-// Matka Game Create
+/* Matka Game Create */
 router.post('/matkagame/create', async(req, res) => {
 
   const daysArray = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
@@ -70,13 +72,20 @@ router.post('/matkagame/create', async(req, res) => {
 
     });
     
-// Matka Game Result Declare
+/* Matka Game Result Declare */
 router.post('/matkagame/resultdeclare', async(req, res) => {
+// Assuming 'istDateString' is the IST date string received from the Android app
+moment.suppressDeprecationWarnings = true;
+const utcDate = moment.tz(req.body.decleredate, 'Asia/Kolkata').utc().format();
+const dateupdate = moment(utcDate).startOf('day').toISOString();
 
-  console.log("hello Result Declere")
-  
-  var results = await MatkaResults.create({
-    
+/*
+// Convert IST string to UTC
+const utcDate = moment.tz(req.body.decleredate).utc().format();
+const utcDate1 =moment().tz(utcDate,"Asia/Kolkata").format();
+let dateupdate = moment(utcDate1).startOf('day').toISOString();
+*/
+  var results = await MatkaResults.create({     
     result_id: generateUniqueID(),
     game_id:req.body.game_id,
     gameId:req.body.gameId,
@@ -84,12 +93,12 @@ router.post('/matkagame/resultdeclare', async(req, res) => {
     opendigit:req.body.opendigit,
     closenumber:req.body.closenumber,
     closedigit:req.body.closedigit,
-    opendeclerestatus:req.body.opendeclerestatus,
-    closedeclerestatus:req.body.closedeclerestatus,
+    opendeclerestatus:0,
+    closedeclerestatus:0,
     openresulttoken:generateUniqueID(),
-    closeresulttoken:generateUniqueID(),
-
+    gameDate:new Date(dateupdate),
   });
+  
     res.status(200).json({
       msg:"Succesfull",
       results:results,
@@ -105,7 +114,7 @@ router.post('/matkagame/matkapaymentDistribution', async(req, res) => {
 
   console.log("Hello Payment Distribution")
   
-  const matkaresult  = await MatkaResults.findOne({_id: req.body._id});
+  const matkaresult  = await MatkaResults.findOne({_id: new Object(req.body._id)});
 
 if(matkaresult.length ==0)
 {
@@ -119,6 +128,9 @@ else
 
     var opennumber = matkaresult.opennumber;
     var opendigit = matkaresult.opendigit;
+
+    console.log("opennumber : "+opennumber);
+    console.log("opendigit : "+opendigit);
 /*
     const filter = {
       $or: [
@@ -132,11 +144,16 @@ else
 */
     const battle = await MatkaBids.aggregate([{
       $match: {
-        $or: [
-          { pana: 'Single Digit' , session: 'open', digits: opendigit }, 
-          { pana: 'Single Pana' , session: 'open', digits: opennumber }, 
-          { pana: 'Double Pana' , session: 'open', digits: opennumber },
-          { pana: 'Triple Pana' , session: 'open', digits: opennumber },
+        $and: [{
+          $or: [
+            { pana: 'Single Digit' , session: 'open', digits: opendigit }, 
+            { pana: 'Single Pana' , session: 'open', digits: opennumber }, 
+            { pana: 'Double Pana' , session: 'open', digits: opennumber },
+            { pana: 'Triple Pana' , session: 'open', digits: opennumber },
+          ]
+        },
+        {paystatus:0},
+       
         ]
       }
   },
@@ -168,21 +185,30 @@ else
          
         });;
 
+        console.log("Battels "+battle);
+
         battle.forEach(async (document) => {
           console.log("User Id :"+document.user_id); 
           var randomString = generateUniqueID();
 
-          await  MatkaBids.findOneAndUpdate({ _id: document._id }, { paystatus: 1,  openresulttoken: randomString, });
+          await  MatkaBids.findOneAndUpdate({ _id: new Object(document._id)}, { paystatus: 1,  resultpaytoken: randomString, openresulttoken:document.openresulttoken });
 
           await Wallet.create({
-            user_id: document.user_id,
+            user_id: new Object(document.user_id),
             txn_order:randomString,
-            txn_type:3,
+            txn_type:1,
+            amount_status:7,
             amount:document.updatepoint,
             txnnote:"Win Matka  : "+document.pana+'-'+document.session
           });
 
-          await User.findOneAndUpdate({ _id: document.user_id }, { wallet_amount: user.wallet_amount+document.updatepoint });
+         // await User.findOneAndUpdate({ _id: new Object(document.user_id) }, { wallet_amount: user.wallet_amount+document.updatepoint });
+
+         await User.findOneAndUpdate(
+          { _id: new Object(document.user_id) },
+          { $inc: { wallet_amount: document.updatepoint } },
+          { new: true } // To return the updated document
+        );
 
         });
 
@@ -309,7 +335,6 @@ if (result.upsertedCount > 0) {
       { $set: { marketstatus: 0 } },
       )
 
-      console.log(result);
       //exit;
 
 /*

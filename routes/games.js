@@ -28,9 +28,6 @@ router.get('/games/getgames',auth, async(req, res) => {
 });
 
 
-
-
-
 // Play Pridication Games
 router.post('/games/playgames',auth, async(req, res) => {
   
