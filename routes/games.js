@@ -11,7 +11,7 @@ const GameResult = require("../models/gameResult");
 const Battle = require("../models/battle");
 
 // socketio service
-//const { app, io, cors, server } = require('../services/socketio');
+const { app, io, cors, server } = require('../services/socketio');
 
 // Get Running Game
 router.get('/games/getgames',auth, async(req, res) => {
@@ -81,6 +81,7 @@ router.post('/games/playgames',auth, async(req, res) => {
     txn_order:randomString,
     txn_type:2,
     amount:req.body.point,
+    amount_status:14,
     txnnote:"Color Bid Placed"
 
   });

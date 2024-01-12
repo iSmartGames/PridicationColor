@@ -16,16 +16,16 @@ const Logger = require("nodemon/lib/utils/log");
 
 // status - 1 Active, 2-Not Active, 3-closed
 
-//const cron = require('node-cron');
+const cron = require('node-cron');
 // Schedule the cron job to run every minute
 //
-//cron.schedule('*/1 * * * * *', () => {
-//  CronCreateGames();
-//  });
+cron.schedule('*/1 * * * * *', () => {
+  CronCreateGames();
+  });
 //
- // cron.schedule('*/10 * * * * *', () => {
- //   CronResultDeclear();
- //   });
+  cron.schedule('*/1 * * * * *', () => {
+    CronResultDeclear();
+    });
 // Game Create
 router.post('/games/create', async(req, res) => {
 /*
@@ -466,9 +466,7 @@ res.status(200).json({
 });
 
 // Result Payment Distribution
-
 router.post('/games/paymentDistrubution', async(req, res) => {
-
  var status= await GameResult.find({gameId: req.body.gameId});
 
  const flagGreenTwo = [1, 3, 7, 9];
@@ -488,7 +486,7 @@ router.post('/games/paymentDistrubution', async(req, res) => {
   if(status.declearstatus==1)
   {
     res.status(200).json({
-      status: "Alreasy Distributed",
+      status: "Already Distributed",
       data:status,
     });
     return;
@@ -606,9 +604,7 @@ async function distrubatepoint(document,updateAmount) {
   }
  
   function generateUniqueID() {
-    const timestamp = new Date().getTime(); // Get current timestamp
-    const randomPart = Math.floor(Math.random() * 100);
-     // Generate random number (you can adjust the range as needed)
+    const timestamp = new Date().getTime(); 
     return `${timestamp}`;
   }
   
@@ -620,8 +616,8 @@ if(!games)
 {
  let currentDate = new Date();
    startdate  = currentDate;
-   stopetime = new Date(currentDate.getTime() + (2.45 * 60000));
-   currentDate = new Date(currentDate.getTime() + (3 * 60000));
+   stopetime = new Date(currentDate.getTime() + (2.44 * 60000));
+   currentDate = new Date(currentDate.getTime() + (2.99 * 60000));
    const uniqueID= generateUniqueID();
 
        var game = await Games.create({
@@ -992,4 +988,5 @@ io.emit("gameResult",gameResult);
 
   }
  } ;
+
 module.exports = router;

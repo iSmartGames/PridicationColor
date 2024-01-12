@@ -16,7 +16,7 @@ const mongoose = require("mongoose")
 
 
 //----- txn_type 2 -Debit
-//----- amount_status  10 - withdraw Request, 11 -withdraw, 12 - matka Bid Place ,13- withdraw by admin
+//----- amount_status  10 - withdraw Request, 11 -withdraw, 12 - matka Bid Place ,13- withdraw by admin, 14 - Pridication Bid Place
 
 
 // Add wallet Amount
