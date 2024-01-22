@@ -7,17 +7,14 @@ const userAccountDetailSchema = new mongoose.Schema({
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        unique: true,
         ref: 'User'
     },
     account_type: {
         type: String,
-        required: true,
         trim: true
     },
     fa_id: {
         type: String,
-        required: true,
         trim: true
     },
     vpa_address: {
@@ -27,8 +24,43 @@ const userAccountDetailSchema = new mongoose.Schema({
     vpa_name: {
         type: String,
         trim: true
+    },
+    
+    vpa_type: {
+        type: String,
+        trim: true
+    },
+    btc_address: {
+        type: String,
+        trim: true
+    },
+    usdt_address: {
+        type: String,
+        trim: true
     }
-
+    ,
+    account_number: {
+        type: Number,
+        trim: true
+    },
+    account_ifsc: {
+        type: String,
+        trim: true
+    },
+    account_acholder: {
+        type: String,
+        trim: true
+    }
+    ,
+    widrow_default: {
+        type: Boolean,
+        default:true
+    }
+    ,
+    account_status: {
+        type: Boolean,
+        default:true
+    }
 }, {
     timestamps: true
 })

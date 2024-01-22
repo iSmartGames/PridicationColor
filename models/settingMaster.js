@@ -59,7 +59,11 @@ const settingMasterSchema = new mongoose.Schema({
         type: Number,
         trim: true
     },
-    threshold_limit_payout: {
+    threshold_min_limit_payout: {
+        type: Number,
+        trim: true
+    },
+    threshold_max_limit_payout: {
         type: Number,
         trim: true
     }

@@ -2,16 +2,17 @@ const express = require("express");
 const session = require('express-session');
 const router = express.Router();
 const mongoose = require("mongoose");
-const StarLinegames = require("../../../models/matka/starlinegames");
+const Galidiswargames = require("../../../models/matka/galidiswargames");
 
 
 // Matka Game Create
-router.post('/starline/create', async(req, res) => {
+router.post('/galidiswar/create', async(req, res) => {
 
-
-    var game = await StarLinegames.create({
+console.log("log");
+    var game = await Galidiswargames.create({
         gameId: generateUniqueID(),
         opentime: req.body.opentime,
+        closetime: req.body.closetime,
         gamename:req.body.gamename,
         status:1,
         marketstatus:1,

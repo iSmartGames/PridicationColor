@@ -9,9 +9,11 @@ const JoinBattle = require("../models/joinBattle")
 const auth = require('../middleware/auth')
 const UserAccountDetail = require("../models/userAccountDetail")
 const SettingMaster = require('../models/settingMaster')
+const TestTime = require("../models/testdate");
 const { addContact, addFundAccount } = require('../library/custom')
 const { check, validationResult } = require('express-validator')
-const axios = require('axios')
+const axios = require('axios');
+
 // const { sendWelcomeEmail, sendCancelationEmail } = require('../emails/account')
 
 router.get('/users/me', auth, async(req, res) => {
@@ -102,19 +104,53 @@ router.post('/user/resendotp', async(req, res) => {
  // User UPI ADD -Update
 router.post('/user/banking',auth, async(req, res) => {
 
+    
         const data = req.body;
-
         console.log(data);
+        try{
+            let userAccountDetail;
 
-        const userAccountDetail = {
-            vpa_address: data.vpa_address,
-            vpa_name: data.vpa_name,
-            account_type: data.account_type,
-            fa_id: data.fa_id,
+        if(data.accountplan=='btc')
+        {
+            userAccountDetail = {
+                btc_address: data.btc_address,
+                widrow_default: true,
+            }
         }
+
+
+        if(data.accountplan=='usdt')
+        {
+            userAccountDetail = {
+                usdt_address: data.usdt_address,
+                widrow_default: true,
+            }
+        }
+
+        
+        if(data.accountplan=='upi')
+        {
+
+            userAccountDetail = {
+                vpa_address: data.vpa_address,
+                vpa_name: data.vpa_name,
+                vpa_type: data.vpa_type,
+                widrow_default: true,
+            }
+        }
+
+        
+        if(data.accountplan=='account')
+        {
+             userAccountDetail = {
+                account_number: data.account_number,
+                account_ifsc: data.account_ifsc,
+                account_acholder: data.account_acholder,
+                widrow_default: true,
+            }
+        }
+/*
         console.log(userAccountDetail);
-
-
         const existingUser = await UserAccountDetail.findOne({user_id: req.user._id,});
 
        if(existingUser)
@@ -135,32 +171,211 @@ router.post('/user/banking',auth, async(req, res) => {
             userAccountDetaila
           });
        }
-      
+       */
+
+       console.log(userAccountDetail);
+
+       if (data._id !== null && data._id !== undefined) {
+        
+        await UserAccountDetail.updateMany({ user_id: req.user._id, }, { widrow_default: false})
+
+        const userAccountDetaila = await UserAccountDetail.findOneAndUpdate({ _id: data._id, }, userAccountDetail)
+        res.status(201).json({
+            status: "success", 
+            userAccountDetaila             
+          });
+
+       }
+       else
+       {
+        await UserAccountDetail.updateMany({ user_id: req.user._id, }, { widrow_default: false})
+
+        const userAccountDetaila = await UserAccountDetail.create({
+            ...req.body,
+            user_id:req.user._id,
+        });
+
+        res.status(201).json({
+            status: "success", 
+            userAccountDetaila
+          });
+       }
+
+
+
+ 
+    }catch(err)
+    {
+            console.log(err);
+    }
  
 });
 
  // User UPI get Details
 router.get('/user/banking',auth, async(req, res) => {
-    const userAccountDetaila = await UserAccountDetail.findOne({user_id: req.user._id,});
+    const userAccountDetaila = await UserAccountDetail.find({user_id: req.user._id, account_status: true});
     if(userAccountDetaila)
     {
-        res.status(201).json({
-            status: "success", 
-            userAccountDetaila             
+        res.status(200).json({
+            status: "Success", 
+            msg:"Data Found",
+            data:userAccountDetaila,
           });
+
+       
     }
     else
     {
-        res.status(400).json({
+        res.status(200).json({
             status: "fail", 
-            userAccountDetaila   
-          }); 
+            msg:"Data Not Found",
+          });
+
     }
      
 });
 
+ // User UPI get Details
+ router.get('/user/bankingdefault',auth, async(req, res) => {
+
+    const userAccountDetaila = await UserAccountDetail.find({user_id: req.user._id, widrow_default : true, account_status: true});
+    if(userAccountDetaila)
+    {
+        res.status(200).json({
+            status: "Success", 
+            msg:"Data Found",
+            data:userAccountDetaila,
+          });
+
+       
+    }
+    else
+    {
+        res.status(200).json({
+            status: "fail", 
+            msg:"Data Not Found",
+          });
+
+    }
+     
+});
+
+/*
+ // User UPI ADD -Update
+ router.post('/user/banking',auth, async(req, res) => {
+
+    
+    const data = req.body;
+    console.log(data);
+    try{
+        let userAccountDetail;
+
+    if(data.accountplan=='btc')
+    {
+        userAccountDetail = {
+            btc_address: data.btc_address,
+        }
+    }
 
 
+    if(data.accountplan=='usdt')
+    {
+        userAccountDetail = {
+            usdt_address: data.usdt_address,
+        }
+    }
+
+
+   if (data._id !== null && data._id !== undefined) {
+   
+    const userAccountDetaila = await UserAccountDetail.findOneAndUpdate({ _id: data._id, }, userAccountDetail)
+    res.status(201).json({
+        status: "success", 
+        userAccountDetaila             
+      });
+
+   }
+   else
+   {
+    const userAccountDetaila = await UserAccountDetail.create({
+        ...req.body,
+        user_id:req.user._id,
+    });
+
+    res.status(201).json({
+        status: "success", 
+        userAccountDetaila
+      });
+   }
+
+
+
+
+}catch(err)
+{
+        console.log(err);
+}
+
+});
+*/
+ // User UPI delete - status removed
+ router.post('/user/bankingdelet',auth, async(req, res) => {
+    
+    const data = req.body;
+    console.log(data);
+    try{
+        let userAccountDetail; 
+        userAccountDetail = {
+            account_status: false,
+        }
+        console.log(userAccountDetail);
+
+        if (data._id !== null && data._id !== undefined) {
+                const userAccountDetaila = await UserAccountDetail.findOneAndUpdate({ _id: data._id, }, userAccountDetail)
+                res.status(201).json({
+                    status: "success", 
+                    userAccountDetaila             
+                });
+
+                    }
+
+        }catch(err)
+        {
+                console.log(err);
+        }
+
+});
+
+ // User UPI delete - status removed
+ router.post('/user/bankingdefault',auth, async(req, res) => {
+    
+    const data = req.body;
+    console.log(req.user._id);
+    try{
+        let userAccountDetail; 
+        userAccountDetail = {
+            widrow_default: false,
+        }
+        console.log(userAccountDetail);
+
+        if (data._id !== null && data._id !== undefined) {
+
+                await UserAccountDetail.updateMany({ user_id: req.user._id, }, userAccountDetail)
+
+                const userAccountDetaila = await UserAccountDetail.findOneAndUpdate({ _id: data._id, }, {widrow_default : true,})
+                res.status(201).json({
+                    status: "success", 
+                    userAccountDetaila             
+                });
+
+                    }
+
+        }catch(err)
+        {
+                console.log(err);
+        }
+
+});
 
 /*
 // User Registration
@@ -526,5 +741,40 @@ function generateOTP() {
   
   // Example usage:
  
+   // User UPI delete - status removed
+ router.post('/user/testtime', async(req, res) => {
+    
+    console.log(new Date().toISOString().slice(11, 23));
+
+    await TestTime.create({
+        game_time: new Date().toISOString().slice(11, 23),
+      });
+
+    // Retrieve the document
+var document = await TestTime.findOne();
+
+// Convert the stored UTC time to a Date object
+var storedUTCTime = new Date(`1970-01-01T${document.game_time}Z`);
+console.log(storedUTCTime);
+
+/*
+    try{
+        const timeinsert = await TestTime.create({
+            game_time: new Date().toISOString().slice(11, 23),
+          });
+      
+               res.status(201).json({
+                    status: "success", 
+                    timeinsert             
+                });
+
+                    
+
+        }catch(err)
+        {
+                console.log(err);
+        }
+*/
+});
   
 module.exports = router;

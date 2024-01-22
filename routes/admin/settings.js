@@ -56,23 +56,5 @@ router.get('/settings/get', async(req, res) => {
     }
 });
 
-// Update settings
-router.get('/settings/getforuser',auth, async(req, res) => {
-    try {
-        
-        const settings = await Settings.find().exec()
-        console.log(settings);
-        var response = {
-            settings: settings[0],
-            status: true
-        }
-        res.status(201).send(response)
-    } catch (e) {
-        var response = {
-            status: false,
-            error: e
-        }
-        res.status(202).send(response)
-    }
-});
+
 module.exports = router;

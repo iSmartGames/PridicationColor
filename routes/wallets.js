@@ -16,7 +16,7 @@ const mongoose = require("mongoose")
 
 
 //----- txn_type 2 -Debit
-//----- amount_status  10 - withdraw Request, 11 -withdraw, 12 - matka Bid Place ,13- withdraw by admin, 14 - Pridication Bid Place
+//----- amount_status  10 - withdraw Request, 11 -withdraw, 12 - matka Bid Place ,13- withdraw by admin, 14 - Pridication Bid Place, 14 - Pridication Bid Place, 14 - Pridication Bid Place
 
 
 // Add wallet Amount
@@ -299,6 +299,7 @@ router.post('/wallet/widrow', auth, async(req, res) => {
             amount: req.body.amount,
             txnnote:"WTHDRAW REQUEST",
             currency: "INR",
+            widrow_bnk_id:req.body.bnkid,
             status: false
         });
 
@@ -330,9 +331,6 @@ router.post('/wallet/widrow', auth, async(req, res) => {
             status: false
         });
     
-    
-    
-    
         if(req.body.amount_status===1)
         {
             var wallet_log = await WalletLog.create({
@@ -357,6 +355,8 @@ router.post('/wallet/widrow', auth, async(req, res) => {
     
         
     });
+
+    
 // Function to generate a random OTP
 function genTxnId() {
     return Math.floor(100000 + Math.random() * 900000).toString();

@@ -26,7 +26,7 @@ const gameBidSchema = new mongoose.Schema({
         type: Number,
         required: true,
       },
-      txn_order: {
+      bidtxn_order: {
         required: true,
         type: Number,
       },

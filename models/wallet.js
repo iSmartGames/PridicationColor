@@ -43,6 +43,10 @@ const walletSchema = new mongoose.Schema({
     status: {
         type: Boolean,
         default: true,
+    },
+    widrow_bnk_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'UserAccountDetail'
     }
 }, {
     timestamps: true

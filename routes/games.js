@@ -11,7 +11,7 @@ const GameResult = require("../models/gameResult");
 const Battle = require("../models/battle");
 
 // socketio service
-const { app, io, cors, server } = require('../services/socketio');
+//const { app, io, cors, server } = require('../services/socketio');
 
 // Get Running Game
 router.get('/games/getgames',auth, async(req, res) => {
@@ -31,8 +31,8 @@ router.get('/games/getgames',auth, async(req, res) => {
 // Play Pridication Games
 router.post('/games/playgames',auth, async(req, res) => {
   
-  var user = await User.findOne({ _id: req.user._id, });
-  if (user.wallet_amount < req.body.point) {
+
+  if(req.user.wallet_amount< req.body.point) {
     res.status(404).json({
       status: "fail", 
       msg:"Sufficient Points Not available",
@@ -68,16 +68,16 @@ router.post('/games/playgames',auth, async(req, res) => {
   const placeBid = await GameBid.create({
     gameId: req.body.gameid,
     periodId:game.periodId,
-    user_id:user._id,
+    user_id:req.user._id,
     periodcolor:req.body.bidcolor,
     periodpoint:req.body.point,
-    txn_order:randomString,
+    bidtxn_order:randomString,
     paystatus:0,
   });
 
 
   const wallet = await Wallet.create({
-    user_id: user._id,
+    user_id: req.user._id,
     txn_order:randomString,
     txn_type:2,
     amount:req.body.point,
@@ -87,8 +87,7 @@ router.post('/games/playgames',auth, async(req, res) => {
   });
 
 
-user.wallet_amount = user.wallet_amount-req.body.point;
-await user.save();
+const user = await User.findByIdAndUpdate(req.user._id, { wallet_amount: req.user.wallet_amount-req.body.point });
 
   res.status(200).json({
     status: "Success", 
@@ -98,11 +97,11 @@ await user.save();
 
  
 });
-
-// Get Orders or Bids - Today - with date
+/*
+// Get Orders or Bids -
 router.get('/games/getorders',auth, async(req, res) => {
   
-  const games = await Games.findOne({status: 1,});
+  const games = await GameBid.find({user_id:req.user._id,});
   if (games) {
       res.status(201).json({
         status: "success", 
@@ -111,13 +110,16 @@ router.get('/games/getorders',auth, async(req, res) => {
     } 
     else
     {
-
+      res.status(200).json({
+        status: "fail", 
+        msg:"Data Not Found",
+      });
 
     }
 
  
 });
-
+*/
 //Get Today Result
 router.get('/games/gettodayresult',auth, async(req, res) => {
   
@@ -148,6 +150,45 @@ router.get('/games/gettodayresult',auth, async(req, res) => {
 });
 
 
+// Get Orders or Bids - Color Pridication
+  router.get('/games/getorders',auth, async(req, res) => {
+
+    console.log(req.user._id);
+
+    const battle = await GameBid.aggregate([{
+      $match: {
+        user_id : req.user._id,
+      }
+  },
+  {
+    $lookup: {
+      from: "wallets",
+      localField: "bidtxn_order",
+      foreignField: "txn_order",
+      as: "pridicationbid"
+    }
+  },
+  {
+    $lookup: {
+      from: "wallets",
+      localField: "resulttoken",
+      foreignField: "txn_order",
+      as: "pridicationwin"
+    }
+  },
+    ]);
+  
+    console.log(battle);
+ 
+      res.status(200).json({
+        status: "success", 
+        msg:"Data Found",
+        data:battle
+      });
+  
+  });
+
+  
 
 // Function to generate a random OTP
 function generaterendom() {

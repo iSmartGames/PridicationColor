@@ -25,10 +25,14 @@ const dashboardRouter = require('./routes/dashboard')
 const battlesRouter = require('./routes/battles')
 const walletsRouter = require('./routes/wallets')
 const gamesRouter = require('./routes/games')
+
+const appdetailsRouter = require('./routes/appdetails')
+/*
 const settingsRouter = require('./routes/admin/settings')
 const AdminRouter = require('./routes/admin/admin')
 const AdminUserRouter = require('./routes/admin/users')
 const AdminBattleRouter = require('./routes/admin/battles')
+*/
 const AdminGameRouter = require('./routes/admin/games')
 
 //matka
@@ -43,6 +47,11 @@ const StarlineGameRouter = require('./routes/matka/starlinegames')
 
 
 
+//Gali Diswar matka
+const GalidiswarAdminGameRouter = require('./routes/matka/matkaadmin/galidiswargameadmin')
+const GalidiswarGameRouter = require('./routes/matka/galidiwargames')
+
+
 
 const PORT = process.env.PORT || 3000
 
@@ -53,10 +62,16 @@ app.use(dashboardRouter)
 app.use(battlesRouter)
 app.use(walletsRouter)
 app.use(gamesRouter)
+
+
+app.use(appdetailsRouter)
+
+/*
 app.use(settingsRouter)
 app.use(AdminRouter)
 app.use(AdminUserRouter)
 app.use(AdminBattleRouter)
+*/
 app.use(AdminGameRouter)
 
 //matka routes
@@ -67,6 +82,12 @@ app.use(MatkaAdminGameRouter)
 //Star Line matka routes
 app.use(StarLineAdminGameRouter)
 app.use(StarlineGameRouter)
+
+
+
+//Gali Diswar matka routes
+app.use(GalidiswarAdminGameRouter)
+app.use(GalidiswarGameRouter)
 
 
 

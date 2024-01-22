@@ -3,28 +3,28 @@ const session = require('express-session');
 const router = express.Router();
 const mongoose = require("mongoose")
 const auth = require('../../middleware/auth');
-const StarLineBids = require("../../models/matka/starlinebids");
+const GalidiswarBids = require("../../models/matka/galidiswarbids");
 const moment = require('moment-timezone');
 const Wallet = require("../../models/wallet");
 const User = require("../../models/user");
 const Banner = require("../../models/matka/banner");
-const StarLineResults = require("../../models/matka/starlineresults");
+const GalidiswarResults = require("../../models/matka/galidiswarresults");
 const { MongoClient, ObjectId } = require('mongodb');
 
-const StarLinegames = require("../../models/matka/starlinegames");
+const Galidiswargames = require("../../models/matka/galidiswargames");
 
 
 
-// Get StarLine Matka Running Game
-router.get('/starline/getmatkagame',auth, async(req, res) => {
+// Get Gali Disawar Matka Running Game
+router.get('/galidiswar/getmatkagame',auth, async(req, res) => {
 
   const utcDate =moment().tz("Asia/Kolkata").format();
   const matchDate = new Date(moment(utcDate).startOf('day').toISOString());
   
-          const battle = await StarLinegames.aggregate([
+          const battle = await Galidiswargames.aggregate([
             {
               $lookup: {
-                from: "starlineresults",
+                from: "galidiswarresults",
                 localField: "_id", // Field from the products collection
                 foreignField: "game_id",
                 pipeline: [
@@ -33,7 +33,7 @@ router.get('/starline/getmatkagame',auth, async(req, res) => {
                       gameDate: matchDate                 
                     }
                      }], // Field from the orders collection
-                as: "starlineresult"
+                as: "galidiswarresult"
               }
             }
             
@@ -46,11 +46,11 @@ router.get('/starline/getmatkagame',auth, async(req, res) => {
   });
 
 // Get Matka Game Status
-router.post('/starline/getmatkagamestatus',auth, async(req, res) => {
+router.post('/galidiswar/getmatkagamestatus',auth, async(req, res) => {
   try {
     const utcDate =moment().tz("Asia/Kolkata").format();
     const matchDate = new Date(moment(utcDate).startOf('day').toISOString());
-    const battle = await StarLinegames.aggregate([
+    const battle = await Galidiswargames.aggregate([
                 {
                   $match: {
                     _id: new ObjectId(req.body._id)
@@ -59,7 +59,7 @@ router.post('/starline/getmatkagamestatus',auth, async(req, res) => {
 
                   {
                   $lookup: {
-                    from: "starlineresults",
+                    from: "galidiswarresults",
                     localField: "_id", // Field from the products collection
                     foreignField: "game_id",
                     pipeline: [
@@ -68,7 +68,7 @@ router.post('/starline/getmatkagamestatus',auth, async(req, res) => {
                     gameDate: matchDate                 
                   }
                         }], // Field from the orders collection
-                    as: "starlineresult"
+                    as: "galidiswarresult"
                   }
                 }
               
@@ -87,8 +87,8 @@ router.post('/starline/getmatkagamestatus',auth, async(req, res) => {
 });
 
 
-// POST Play Starline Matka  game
-router.post('/starline/playmatkagame',auth, async(req, res) => {
+// POST Play Gali Diswar Matka  game
+router.post('/galidiswar/playmatkagame',auth, async(req, res) => {
   try {
    
     if(req.user.wallet_amount<req.body.totalpoint)
@@ -99,7 +99,7 @@ router.post('/starline/playmatkagame',auth, async(req, res) => {
       });
     }
     
-    const games = await StarLinegames.findOne({gameId: req.body.gameId,});
+    const games = await Galidiswargames.findOne({gameId: req.body.gameId,});
   
     if(!games)
     {
@@ -137,61 +137,10 @@ router.post('/starline/playmatkagame',auth, async(req, res) => {
   
   
   
-    if(req.body.gmetype== "1" || req.body.gmetype == "3" || req.body.gmetype == "4" || req.body.gmetype == "5" || req.body.gmetype == "8"|| req.body.gmetype == "9")
-    {
-  
-      const bidsData = JSON.parse(req.body.bids);
-      const result =bidsData.forEach(async (data) => {
-        try {
-            
-          const randomString = generaterendom();
-          console.log("making placing Bid")
-          const placeBid = await StarLineBids.create({
-            bid_id : generaterendom(),
-            game_id: req.body._id,
-            gameId:req.body.gameId,
-            user_id:req.user._id,
-            gamename:req.body.gamename,
-            pana:data.pana,
-            session:req.body.session,
-            digits:data.digit,
-            closedigits:data.closedigits,
-            points:data.Point,
-            bid_date:new Date(),
-            bid_tx_id:randomString,
-            status:1,
-            paystatus:0,
-          });
-  
-          const wallet = await Wallet.create({
-            user_id: req.user._id,
-            txn_order:randomString,
-            txn_type:2,
-            amount_status:12,
-            amount:data.Point,
-            txnnote:"Matka Bid Placed"
-          
-          });
-          
-          const user = await User.findByIdAndUpdate(req.user._id, { wallet_amount: req.user.wallet_amount-data.Point });
-          
-          console.log(`Successfully inserted: ${placeBid}`);
-        } catch (error) {
-            console.error(`Error inserting data: ${error}`);
-        }
-    });
-  
-    res.status(200).json({
-      status: "Success", 
-      msg:"Bid Placed Successfully",
-      placeBid:result,
-    });
-      
-
-    }
   
     if(req.body.gmetype== "2" )
     {
+/*
       if (currentTimeIST.isAfter(opentimeToCompare, 'minute')) {
         res.status(202).json({
           status: "fail", 
@@ -199,7 +148,7 @@ router.post('/starline/playmatkagame',auth, async(req, res) => {
         });
         return;
       }
-  
+  */
    
       const bidsData = JSON.parse(req.body.bids);
       const result =bidsData.forEach(async (data) => {
@@ -207,7 +156,7 @@ router.post('/starline/playmatkagame',auth, async(req, res) => {
             
           const randomString = generaterendom();
           console.log("making placing Bid")
-          const placeBid = await StarLineBids.create({
+          const placeBid = await GalidiswarBids.create({
             bid_id : generaterendom(),
             game_id: req.body._id,
             gameId:req.body.gameId,
@@ -250,133 +199,17 @@ router.post('/starline/playmatkagame',auth, async(req, res) => {
     }
   
   
-    if(req.body.gmetype== "6" )
-    {
-      if (currentTimeIST.isAfter(opentimeToCompare, 'minute')) {
-        res.status(202).json({
-          status: "fail", 
-          msg:"Market Bid Closed for Jodi"
-        });
-        return;
-      }
-  
-      const bidsData = JSON.parse(req.body.bids);
-      const result =bidsData.forEach(async (data) => {
-        try {
-          const randomString = generaterendom();
-          console.log("making placing Bid")
-          const placeBid = await StarLineBids.create({
-            bid_id : generaterendom(),
-            game_id: req.body._id,
-            gameId:req.body.gameId,
-            user_id:req.user._id,
-            gamename:req.body.gamename,
-            pana:data.pana,
-            digits:data.digit,
-            closedigits:data.closedigits,
-            session:req.body.session,
-            points:data.Point,
-            bid_date:new Date(),
-            bid_tx_id:randomString,
-            status:1,
-            paystatus:0,
-          });
-  
-          const wallet = await Wallet.create({
-            user_id: req.user._id,
-            txn_order:randomString,
-            txn_type:2,
-            amount:data.Point,
-            txnnote:"Matka Bid Placed"
-          
-          });
-          
-          const user = await User.findByIdAndUpdate(req.user._id, { wallet_amount: req.user.wallet_amount-data.Point });
-          console.log(`Successfully inserted: ${placeBid}`);
-        } catch (error) {
-            console.error(`Error inserting data: ${error}`);
-        }
-    });
-  
-    res.status(200).json({
-      status: "Success", 
-      msg:"Bid Placed Successfully",
-      placeBid:result,
-    });
-     
-  }
-  
 
-  
-    if(req.body.gmetype== "7")
-    {
-      if (currentTimeIST.isAfter(opentimeToCompare, 'minute')) {
-        res.status(202).json({
-          status: "fail", 
-          msg:"Open Session Closed"
-        });
-        return;
-      }
-  
-    const bidsData = JSON.parse(req.body.bids);
-    const result =bidsData.forEach(async (data) => {
-      try {
-          
-        const randomString = generaterendom();
-        console.log("making placing Bid")
-        const placeBid = await StarLineBids.create({
-          bid_id : generaterendom(),
-          game_id: req.body._id,
-          gameId:req.body.gameId,
-          user_id:req.user._id,
-          gamename:req.body.gamename,
-          pana:data.pana,
-          digits:data.digit,
-          closedigits:data.closedigits,
-          points:data.Point,
-          bid_date:new Date(),
-          bid_tx_id:randomString,
-          status:1,
-          paystatus:0,
-        });
-  
-        const wallet = await Wallet.create({
-          user_id: req.user._id,
-          txn_order:randomString,
-          txn_type:2,
-          amount:data.Point,
-          txnnote:"Matka Bid Placed"
-        
-        });
-        
-        const user = await User.findByIdAndUpdate(req.user._id, { wallet_amount: req.user.wallet_amount-data.Point });
-        
-        console.log(`Successfully inserted: ${placeBid}`);
-      } catch (error) {
-          console.error(`Error inserting data: ${error}`);
-      }
-  });
-  
-  res.status(200).json({
-    status: "Success", 
-    msg:"Bid Placed Successfully",
-    placeBid:result,
-  });
-    
-  }
-  
-  
   
   } catch (error) {
    
   }
   });
 
+    // Get Gali diswar Matka Game Bid History 
+router.post('/galidiswar/matkagamehistory',auth, async(req, res) => {
 
-  // Get Starline Matka Game Bid History 
-router.post('/starline/matkagamehistory',auth, async(req, res) => {
-
-  const battle = await StarLineBids.aggregate([{
+  const battle = await GalidiswarBids.aggregate([{
     $match: {
       user_id : new ObjectId(req.user._id),
     }
@@ -417,16 +250,16 @@ router.post('/starline/matkagamehistory',auth, async(req, res) => {
 
 });
 
-//Get StarLine Matka Result - Name - for Result
-router.post('/starline/matkaresulthistory',auth, async(req, res) => {
+//Get Gali Diswar Matka Result - Name - for Result
+router.post('/galidiswar/matkaresulthistory',auth, async(req, res) => {
   // Assuming 'istDateString' is the IST date string received from the Android app
   moment.suppressDeprecationWarnings = true;
   const utcDate = moment.tz(req.body.decleredate, 'Asia/Kolkata').utc().format();
   const dateupdate = moment(utcDate).startOf('day').toISOString();
-    const battle = await StarLinegames.aggregate([
+    const battle = await Galidiswargames.aggregate([
       {
         $lookup: {
-          from: "starlineresults",
+          from: "galidiswarresults",
           localField: "_id", // Field from the products collection
           foreignField: "game_id",
           pipeline: [
@@ -448,7 +281,6 @@ router.post('/starline/matkaresulthistory',auth, async(req, res) => {
       
   });
 
-  
 function generaterendom() {
   const timestamp = new Date().getTime();
   return `${timestamp}`;
