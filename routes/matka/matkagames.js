@@ -153,7 +153,7 @@ try {
   const closetimeToCompare = currentTimeIST.clone().set({ hour: closehours, minute: closeminutes, second: 0 });
   
 
-  if(req.body.gmetype== "1" || req.body.gmetype == "3" || req.body.gmetype == "4" || req.body.gmetype == "5" || req.body.gmetype == "8"|| req.body.gmetype == "9")
+  if(req.body.gmetype== "1" || req.body.gmetype == "3" || req.body.gmetype == "4" || req.body.gmetype == "5" || req.body.gmetype == "8"|| req.body.gmetype == "9" || req.body.gmetype == "10")
   {
 
     if(req.body.session=='open')
