@@ -21,57 +21,64 @@ const mongoose = require("mongoose")
 
 // Add wallet Amount
 router.post('/wallet/add', auth, async(req, res) => {
-    var wallet = await Wallet.create({
-        user_id: req.user._id,
-        txn_order:genTxnId(),
-        order_id: req.body.order_id,
-        txn_type:1,
-        amount_status:req.body.amount_status,
-        amount: req.body.amount,
-        txnnote:"ADD POINT",
-        currency: req.body.currency,
-        receipt: req.body.receipt,
-        status: false
-    });
 
-
-
-
-    if(req.body.amount_status===1)
-    {
-        var wallet_log = await WalletLog.create({
-            txn_order: wallet.txn_order,
-            order_id:req.body.order_id,
-            payment_id: req.body.payment_id
+    try{
+        const rendid = genTxnId();
+        var wallet = await Wallet.create({
+            user_id: req.user._id,
+            txn_order:rendid,
+            order_id: req.body.order_id,
+            txn_type:1,
+            amount_status:req.body.amount_status,
+            amountadd_status:req.body.amountadd_status,
+            amount: req.body.amount,
+            txnnote:"ADD POINT",
+            currency: req.body.currency,
+            receipt: req.body.receipt,
+            status: false
+        });
+    
+    
+        let user;
+    
+        if(req.body.amountadd_status===1)
+        {
             
-        });        
-    }
-            var user = await User.findOne({ _id: wallet.user_id })
+            var wallet_log = await WalletLog.create({
+                txn_order: rendid,
+                order_id:req.body.order_id,
+                payment_id: req.body.payment_id
+                
+            }); 
+    
+            user = await User.findOne({ _id: wallet.user_id })
             var updated_wallet = user.wallet_amount + (wallet.amount)
             await User.findOneAndUpdate({ _id: wallet.user_id }, { wallet_amount: updated_wallet })
-/*
-            //update user wallet in user collection
-            var user = await User.findOne({ _id: user_id })
-            var updated_wallet = user.wallet_amount + (data.amount / 100)
-            await User.findOneAndUpdate({ _id: user_id }, { wallet_amount: updated_wallet })
-*/
-    res.status(201).json({
-        status: "success", 
-        data:{
-            user,
-        }     
-      });
-
-      res.status(400).json({
-        status: "fail", 
-        data:{
-            res,
-        }     
-      });
-
-    //await wallet.save();
-
+         
+        }
     
+        res.status(201).json({
+            status: "success", 
+            data:{
+                user,
+            }     
+          });
+    
+          res.status(400).json({
+            status: "fail", 
+            data:{
+                res,
+            }     
+          });
+
+    }
+    catch(err)
+    {
+
+    }
+
+
+      
 });
 
 /*

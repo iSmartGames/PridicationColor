@@ -24,6 +24,10 @@ const walletSchema = new mongoose.Schema({
         type: Number,
         trim:true
     },
+    amountadd_status: {
+        type: Number,
+        trim:true
+    },
     amount: {
         type: Number,
         trim: true
