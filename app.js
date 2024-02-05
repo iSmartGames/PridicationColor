@@ -7,8 +7,14 @@ const mongoose = require('./db/mongoose')
 const fileUpload = require('express-fileupload');
 const moment = require('moment-timezone');
 
+const express = require('express');
+const web = express();
+/*const port = 80;
+*/
 // socketio service
 const { app, io, cors, server } = require('./services/socketio')
+
+
 
 // Express settings
 app.use(bodyParser.json());
@@ -16,8 +22,6 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(fileUpload())
-
-
 
 
 const userRouter = require('./routes/user')
@@ -53,7 +57,7 @@ const GalidiswarGameRouter = require('./routes/matka/galidiwargames')
 
 
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 80
 
 
 //routes
@@ -89,6 +93,11 @@ app.use(StarlineGameRouter)
 app.use(GalidiswarAdminGameRouter)
 app.use(GalidiswarGameRouter)
 
+
+app.use(express.static('public'));
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
 
 
 

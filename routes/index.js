@@ -6,7 +6,7 @@ const router = require("express").Router();
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json())
-
+z
 const registration = require("../controllers/registration");
 
 router.get("/", registration.userRegistration);

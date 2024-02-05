@@ -14,7 +14,7 @@ const multer = require('multer');
 
 
 const cron = require('node-cron');
-cron.schedule('*/1 * * * * *', () => {
+cron.schedule('*/10 * * * * *', () => {
   marketstatuscheck();
   });
 
@@ -320,6 +320,7 @@ if (result.upsertedCount > 0) {
         
         const time = hours+":"+minutes;
 
+        console.log(time);
 
       const result =   await MatkaGames.findOneAndUpdate({
         $and: [
