@@ -111,7 +111,7 @@ const options = {
 };
 
 // Create HTTPS server
-const httpsServer = https.createServer(web);
+const httpsServer = https.createServer(web,options);
 
 const httpsPort = 443;
 
