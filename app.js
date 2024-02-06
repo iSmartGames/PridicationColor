@@ -103,7 +103,7 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-/*
+
 // Load ACM certificate and private key
 const options = {
   key: fs.readFileSync('path/to/private-key.pem'),
@@ -121,7 +121,8 @@ const httpsPort = 443;
 httpsServer.listen(httpsPort, () => {
   //console.log(`HTTPS server running on https://localhost:${httpsPort}`);
 });
-*/
+
+
 // server configurations
 server.listen(PORT, () => {
     console.log(`Server is running at port no: ${PORT}`)
