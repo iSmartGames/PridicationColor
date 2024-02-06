@@ -113,7 +113,7 @@ const options = {
 // Create HTTPS server
 const httpsServer = https.createServer(options, (req, res) => {
   res.writeHead(200);
-  res.end('Hello, secure world!\n');
+  //res.end('Hello, secure world!\n');
 });
 
 const httpsPort = 443;
