@@ -6,13 +6,19 @@ const dotenv = require('dotenv').config()
 const mongoose = require('./db/mongoose')
 const fileUpload = require('express-fileupload');
 const moment = require('moment-timezone');
-
+const https = require('https');
+const fs = require('fs');
 const express = require('express');
-const web = express();
-/*const port = 80;
-*/
+
+const options = {
+  key: fs.readFileSync('path/to/private-key.pem'),        // Replace with your private key
+  cert: fs.readFileSync('path/to/certificate.pem'),        // Replace with your certificate
+  ca: fs.readFileSync('path/to/ca.pem'),                   // Replace with your certificate authority (optional)
+};
+
 // socketio service
 const { app, io, cors, server } = require('./services/socketio')
+
 
 
 
@@ -105,3 +111,9 @@ app.get('/', (req, res) => {
 server.listen(PORT, () => {
     console.log(`Server is running at port no: ${PORT}`)
 })
+
+const server = https.createServer(options, app);
+const PORT1 = 443;
+server.listen(PORT1, () => {
+ // console.log(`Server is running on https://localhost:${PORT}`);
+});
