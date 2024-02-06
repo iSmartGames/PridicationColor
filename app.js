@@ -6,22 +6,17 @@ const dotenv = require('dotenv').config()
 const mongoose = require('./db/mongoose')
 const fileUpload = require('express-fileupload');
 const moment = require('moment-timezone');
+
+const http = require('http');
 const https = require('https');
 const fs = require('fs');
+
 const express = require('express');
-
-const webssl = express();
-
-
-const options = {
-  key: fs.readFileSync('path/to/private-key.pem'),        // Replace with your private key
-  cert: fs.readFileSync('path/to/certificate.pem'),        // Replace with your certificate
-  ca: fs.readFileSync('path/to/ca.pem'),                   // Replace with your certificate authority (optional)
-};
-
+const web = express();
+/*const port = 80;
+*/
 // socketio service
 const { app, io, cors, server } = require('./services/socketio')
-
 
 
 
@@ -109,14 +104,25 @@ app.get('/', (req, res) => {
 });
 
 
+// Load ACM certificate and private key
+const options = {
+  key: fs.readFileSync('path/to/private-key.pem'),
+  cert: fs.readFileSync('path/to/certificate.pem'),
+};
+
+// Create HTTPS server
+const httpsServer = https.createServer(options, (req, res) => {
+ // res.writeHead(200);
+ // res.end('Hello, secure world!\n');
+});
+
+const httpsPort = 443;
+
+httpsServer.listen(httpsPort, () => {
+  //console.log(`HTTPS server running on https://localhost:${httpsPort}`);
+});
 
 // server configurations
 server.listen(PORT, () => {
     console.log(`Server is running at port no: ${PORT}`)
 })
-
-const server = https.createServer(options, webssl);
-const PORT1 = 443;
-server.listen(PORT1, () => {
- // console.log(`Server is running on https://localhost:${PORT}`);
-});
