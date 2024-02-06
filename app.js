@@ -16,7 +16,7 @@ const web = express();
 /*const port = 80;
 */
 // socketio service
-const { app, io, cors, server } = require('./services/socketio')
+const { app, io, cors, server , httpsserver } = require('./services/socketio')
 
 
 
@@ -111,7 +111,10 @@ const options = {
 };
 
 // Create HTTPS server
-const httpsServer = https.createServer(web,options);
+const httpsServer = https.createServer(options, (req, res) => {
+  res.writeHead(200);
+  res.end('Hello, secure world!\n');
+});
 
 const httpsPort = 443;
 
