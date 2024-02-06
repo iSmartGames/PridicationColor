@@ -10,6 +10,9 @@ const https = require('https');
 const fs = require('fs');
 const express = require('express');
 
+const webssl = express();
+
+
 const options = {
   key: fs.readFileSync('path/to/private-key.pem'),        // Replace with your private key
   cert: fs.readFileSync('path/to/certificate.pem'),        // Replace with your certificate
@@ -112,7 +115,7 @@ server.listen(PORT, () => {
     console.log(`Server is running at port no: ${PORT}`)
 })
 
-const server = https.createServer(options, app);
+const server = https.createServer(options, webssl);
 const PORT1 = 443;
 server.listen(PORT1, () => {
  // console.log(`Server is running on https://localhost:${PORT}`);
