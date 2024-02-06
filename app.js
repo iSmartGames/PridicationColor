@@ -107,7 +107,7 @@ app.get('/', (req, res) => {
 // Load ACM certificate and private key
 const options = {
   key: fs.readFileSync(__dirname +'/privatekey.key'),
-  cert: fs.readFileSync('path/to/certificate.pem'),
+  cert: fs.readFileSync(__dirname +'/certificate.pem'),
 };
 
 // Create HTTPS server
