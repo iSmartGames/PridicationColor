@@ -10,6 +10,27 @@ const  AppContcat = require("../models/appcontact");
 const  Settings = require('../models/settingMaster');
 const  Howtoplay = require('../models/howtoplay');
 const  Gamerule = require('../models/gamerule');
+const AppStatus = require('../models/appstatus');
+
+// App STATUS - ACTIVE OR NON ACTIVE
+router.get('/app/appstatus', async(req, res) => {
+    try {
+        
+        const appstatus = await AppStatus.find().exec()
+        console.log(appstatus);
+        var response = {
+            appstatus: appstatus[0],
+            status: true
+        }
+        res.status(201).send(response)
+    } catch (e) {
+        var response = {
+            status: false,
+            error: e
+        }
+        res.status(202).send(response)
+    }
+});
 
 
 // App Get banking
