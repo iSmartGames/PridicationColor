@@ -54,7 +54,7 @@ router.get('/app/appbanking',auth, async(req, res) => {
 });
 
 // App Get Contact Details
-router.get('/app/contactdetails',auth, async(req, res) => {
+router.get('/app/contactdetails', async(req, res) => {
     try {
         const contact = await AppContcat.find().exec()
         console.log(contact);
