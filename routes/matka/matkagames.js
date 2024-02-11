@@ -42,6 +42,37 @@ const matchDate = new Date(moment(utcDate).startOf('day').toISOString());
           });
 });
 
+// Get Matka Running Game
+router.get('/matkagame/getmatkagamefalse', async(req, res) => {
+
+  const utcDate =moment().tz("Asia/Kolkata").format();
+  const matchDate = new Date(moment(utcDate).startOf('day').toISOString());
+  
+          const battle = await MatkaGames.aggregate([
+            {
+              $lookup: {
+                from: "matkaresults",
+                localField: "_id", // Field from the products collection
+                foreignField: "game_id",
+                pipeline: [
+                  {
+                    $match:{
+                      gameDate: matchDate                 
+                    }
+                     }], // Field from the orders collection
+                as: "matkaresult"
+              }
+            }
+            
+          ]);
+          
+            res.status(201).json({
+              status: "success", 
+              data:battle,
+            });
+  });
+
+  
 // Get Matka App Banner-Text
 router.get('/matkagame/banner',auth, async(req, res) => {
   var game = await Banner.findOne();
