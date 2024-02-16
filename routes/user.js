@@ -721,7 +721,7 @@ function generateOTP() {
  
   async function sendMessage(mobile, message) {
     try {
-      const response = await axios.post('http://sms.pushpaksms.com/api_v2/message/send', 
+      const response = await axios.post('http://www.pushpaksms.com/api_v2/message/send', 
       'sender_id=JODSMS&dlt_template_id=1207168680839278353&message=' + message + ' is the OTP verify your mobile number for . NEVER SHARE YOUR OTP WITH ANYONE. JSHPL&mobile_no=' + mobile, {
         headers: {
           'authorization': 'Bearer 0BGjhGd-8QAqgC-iH_9rb0_sffZ85s-Toj0W_MXKJOR299uvyhPdTGBuEdV55Qu8',
