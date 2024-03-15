@@ -35,6 +35,11 @@ const walletsRouter = require('./routes/wallets')
 const gamesRouter = require('./routes/games')
 
 const appdetailsRouter = require('./routes/appdetails')
+
+
+// ADMIN
+const AdminRouter = require('./routes/admin/admin')
+const AdminSettingRouter = require('./routes/admin/adminsetting')
 /*
 const settingsRouter = require('./routes/admin/settings')
 const AdminRouter = require('./routes/admin/admin')
@@ -73,6 +78,11 @@ app.use(gamesRouter)
 
 
 app.use(appdetailsRouter)
+
+//Admin Routs
+app.use(AdminRouter)
+app.use(AdminSettingRouter)
+
 
 /*
 app.use(settingsRouter)
